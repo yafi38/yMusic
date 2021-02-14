@@ -91,6 +91,11 @@ const play = async (message, voiceChannel, args) => {
 
 
 const playDir = async (message, voiceChannel, args) => {
+    if (!message.member.roles.cache.some(role => role.name === 'yDJ')) {
+        message.channel.send('You do not have the permission')
+        return
+    }
+    
     var dirName = args.join(' ').toLowerCase()
     var songList = getMusicFiles(dirName)
 

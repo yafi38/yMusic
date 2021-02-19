@@ -6,7 +6,7 @@ const playList = require('../utils/playList')
 module.exports = {
     name: 'play',
     description: 'Play a song',
-    aliases: ['skip', 'stop', 'playdir'],
+    aliases: ['skip', 'stop', 'playdir', 'pause', 'resume'],
     async execute(message, commandName, args) {
         const voiceChannel = message.member.voice.channel
         if (!voiceChannel) {
@@ -33,6 +33,18 @@ module.exports = {
             }
         } else if (commandName === 'playdir') {
             playDir(message, voiceChannel, args)
+        } else if (commandName === 'pause') {
+            if (!playList.getQ()) {
+                message.channel.send('Nothing to pause :sweat_smile:')
+            } else {
+                playList.getQ().connection.dispatcher.pause()
+            }
+        } else if (commandName === 'resume') {
+            if (!playList.getQ() || !playList.getQ().connection.dispatcher.paused) {
+                message.channel.send('Nothing to resume :sweat_smile:')
+            } else {
+                playList.getQ().connection.dispatcher.resume()
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 const fs = require('fs')
 const getMusicFiles = require('../utils/getMusicFiles')
+const playList = require('../utils/playList')
 
-var q = null
 
 module.exports = {
     name: 'play',
@@ -23,14 +23,13 @@ module.exports = {
         if (commandName === 'play') {
             play(message, voiceChannel, args)
         } else if (commandName === 'stop') {
-            q = null
-            await voiceChannel.leave()
+            playList.deleteQ()
             await message.channel.send('Leaving channel :smiling_face_with_tear: ')
         } else if (commandName === 'skip') {
-            if (!q) {
+            if (!playList.getQ()) {
                 message.channel.send('Nothing to skip :sweat_smile:')
             } else {
-                q.connection.dispatcher.end()
+                playList.getQ().connection.dispatcher.end()
             }
         } else if (commandName === 'playdir') {
             playDir(message, voiceChannel, args)
@@ -60,28 +59,24 @@ const play = async (message, voiceChannel, args) => {
     }
 
     if (songPath) {
-        if (!q) {
+        if (!playList.getQ()) {
 
-            q = {
-                channel: message.channel,
-                voiceChannel: voiceChannel,
-                connection: null,
-                songs: []
-            }
-            q.songs.push(songPath)
+            playList.createQ(message.channel, voiceChannel, null)
+            
+            playList.getQ().songs.push(songPath)
 
             try {
                 const connection = await voiceChannel.join()
-                q.connection = connection
-                playSong(q)
+                playList.getQ().connection = connection
+                playSong()
             } catch (err) {
                 console.log(err)
                 message.channel.send(`Some error occured`)
-                q = null
+                playList.deleteQ()
                 voiceChannel.leave()
             }
         } else {
-            q.songs.push(songPath)
+            playList.getQ().songs.push(songPath)
             message.channel.send(`:clock3: **${songPath.replace(/.+\\/, '').replace('.mp3', '')}** added to the queue`)
         }
     } else {
@@ -104,28 +99,23 @@ const playDir = async (message, voiceChannel, args) => {
         return
     }
 
-    if (!q) {
-        q = {
-            channel: message.channel,
-            voiceChannel: voiceChannel,
-            connection: null,
-            songs: []
-        }
+    if (!playList.getQ()) {
+        playList.createQ(message.channel, voiceChannel, null)
     }
 
     songList.forEach(song => {
-        q.songs.push(song)
+        playList.getQ().songs.push(song)
     })
 
     message.channel.send(`Successfully added ${songList.length} songs to play list`)
     try {
         const connection = await voiceChannel.join()
-        q.connection = connection
-        playSong(q)
+        playList.getQ().connection = connection
+        playSong()
     } catch (err) {
         console.log(err)
         message.channel.send(`Some error occured`)
-        q = null
+        playList.deleteQ()
         voiceChannel.leave()
     }
 }
@@ -135,17 +125,16 @@ const playDir = async (message, voiceChannel, args) => {
 
 
 const playSong = async () => {
-    if (q.songs.length == 0) {
-        q.voiceChannel.leave()
-        q = null
+    if (playList.getQ().songs.length == 0) {
+        playList.deleteQ()
         return
     }
 
-    song = q.songs.shift()
-    q.channel.send(`:arrow_forward: Now playing **${song.replace(/.+\\/, '').replace('.mp3', '')}**`)
-    q.connection.play(song, { seek: 0, volume: 1 })
+    song = playList.getQ().songs.shift()
+    playList.getQ().channel.send(`:arrow_forward: Now playing **${song.replace(/.+\\/, '').replace('.mp3', '')}**`)
+    playList.getQ().connection.play(song, { seek: 0, volume: 0.5 })
         .on('finish', () => {
-            playSong(q)
+            playSong()
         })
 
 }

@@ -3,6 +3,7 @@ const playList = require("../utils/playList");
 const hasPermission = require('../utils/hasPermission')
 const browseDirectory = require("../utils/browseDirectory");
 const playSong = require("../utils/playSong");
+const shuffleArray = require("../utils/shuffleArray")
 
 module.exports = {
     name: "playDir",
@@ -35,7 +36,6 @@ module.exports = {
         }
 
         if (dirPath) {
-            console.log(dirPath);
             var [songList, _] = browseDirectory(dirPath);
 
             if (songList.length == 0) {
@@ -51,8 +51,10 @@ module.exports = {
                 playList.getQ().songs.push(song);
             });
 
+            shuffleArray(playList.getQ().songs)
+
             message.channel.send(
-                `Successfully added ${songList.length} songs to play list`
+                `Successfully added ${songList.length} songs from ${dirPath.replace(/.+\\/, "")} to play list`
             );
             try {
                 const connection = await voiceChannel.join();

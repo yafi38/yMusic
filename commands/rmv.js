@@ -14,7 +14,17 @@ module.exports = {
                 console.log(err);
             } else {
                 message.channel.send(
-                    "Successfully removed all directory from the list"
+                    "Successfully removed all songs from the list"
+                );
+            }
+        });
+
+        fs.writeFile("dirList.txt", "", (err) => {
+            if (err) {
+                console.log(err);
+            } else {
+                message.channel.send(
+                    "Successfully removed all directories from the list"
                 );
             }
         });

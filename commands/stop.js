@@ -4,7 +4,7 @@ module.exports = {
     name: "stop",
     description: "Stop playing song and leave the voice channel",
     aliases: ["st"],
-    execute(message, args) {
+    async execute(message, args) {
         const voiceChannel = message.member.voice.channel;
 
         if (!playList.getQ()) {

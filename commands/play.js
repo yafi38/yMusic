@@ -6,7 +6,7 @@ const playSong = require("../utils/playSong");
 module.exports = {
     name: "play",
     description: "Play a song",
-    aliases: ["playdir"],
+    aliases: ["p"],
     async execute(message, args) {
         const voiceChannel = message.member.voice.channel;
 

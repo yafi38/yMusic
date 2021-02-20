@@ -5,7 +5,7 @@ const getMusicFiles = require("../utils/getMusicFiles");
 module.exports = {
     name: "add",
     description: "Adds a directory to browse music from",
-    execute(message, commandName, args) {
+    execute(message, args) {
         if (!message.member.roles.cache.some((role) => role.name === "yDJ")) {
             message.channel.send("You do not have the permission");
             return;

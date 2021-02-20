@@ -3,7 +3,7 @@ const fs = require("fs");
 module.exports = {
     name: "rmv",
     description: "Removes all directories to browse music from",
-    execute(message, commandName, args) {
+    execute(message, args) {
         if (!message.member.roles.cache.some((role) => role.name === "yDJ")) {
             message.channel.send("You do not have the permission");
             return;
